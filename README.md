@@ -12,13 +12,13 @@ It's recommended to use loggercheck with [golangci-lint](https://golangci-lint.r
 
 ## Badges
 
-[![License](https://img.shields.io/github/license/georgemaroun/tracecheck.svg)](/LICENSE)
-[![Release](https://img.shields.io/github/release/georgemaroun/tracecheck.svg)](https://github.com/georgemaroun/tracecheck/releases/latest)
+[![License](https://img.shields.io/github/license/george-maroun/tracecheck.svg)](/LICENSE)
+[![Release](https://img.shields.io/github/release/george-maroun/tracecheck.svg)](https://github.com/george-maroun/tracecheck/releases/latest)
 
 ## Install
 
 ```shel
-go install github.com/georgemaroun/tracecheck/cmd/tracecheck
+go install github.com/george-maroun/tracecheck/cmd/tracecheck
 ```
 
 ## Usage
