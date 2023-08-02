@@ -10,12 +10,6 @@ A linter checks the odd number of key and value pairs for common logger librarie
 
 It's recommended to use loggercheck with [golangci-lint](https://golangci-lint.run/usage/linters/#loggercheck).
 
-## Badges
-
-![Build Status](https://github.com/timonwong/loggercheck/workflows/CI/badge.svg)
-[![Coverage](https://img.shields.io/codecov/c/github/timonwong/loggercheck?token=Nutf41gwoG)](https://app.codecov.io/gh/timonwong/loggercheck)
-[![License](https://img.shields.io/github/license/timonwong/loggercheck.svg)](/LICENSE)
-[![Release](https://img.shields.io/github/release/timonwong/loggercheck.svg)](https://github.com/timonwong/loggercheck/releases/latest)
 
 ## Install
 
