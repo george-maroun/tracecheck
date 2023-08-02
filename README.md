@@ -10,11 +10,15 @@ A linter checks the odd number of key and value pairs for common logger librarie
 
 It's recommended to use loggercheck with [golangci-lint](https://golangci-lint.run/usage/linters/#loggercheck).
 
+## Badges
+
+[![License](https://img.shields.io/github/license/georgemaroun/tracecheck.svg)](/LICENSE)
+[![Release](https://img.shields.io/github/release/georgemaroun/tracecheck.svg)](https://github.com/georgemaroun/tracecheck/releases/latest)
 
 ## Install
 
 ```shel
-go install github.com/timonwong/loggercheck/cmd/loggercheck
+go install github.com/georgemaroun/tracecheck/cmd/tracecheck
 ```
 
 ## Usage
