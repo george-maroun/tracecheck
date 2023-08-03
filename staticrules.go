@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/jlewi/roboweb/tracecheck/internal/checkers"
-	"github.com/jlewi/roboweb/tracecheck/internal/rules"
+	"github.com/george-maroun/tracecheck/internal/checkers"
+	"github.com/george-maroun/tracecheck/internal/rules"
 )
 
 var (

@@ -8,7 +8,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/jlewi/roboweb/tracecheck/internal/bytebufferpool"
+	"github.com/george-maroun/tracecheck/internal/bytebufferpool"
 )
 
 var ErrInvalidRule = errors.New("invalid rule format")

@@ -1,4 +1,4 @@
-module github.com/jlewi/roboweb/tracecheck
+module github.com/george-maroun/tracecheck
 
 go 1.19
 

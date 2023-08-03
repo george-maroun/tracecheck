@@ -13,9 +13,9 @@ import (
 	"golang.org/x/tools/go/ast/inspector"
 	"golang.org/x/tools/go/types/typeutil"
 
-	"github.com/jlewi/roboweb/tracecheck/internal/checkers"
-	"github.com/jlewi/roboweb/tracecheck/internal/rules"
-	"github.com/jlewi/roboweb/tracecheck/internal/sets"
+	"github.com/george-maroun/tracecheck/internal/checkers"
+	"github.com/george-maroun/tracecheck/internal/rules"
+	"github.com/george-maroun/tracecheck/internal/sets"
 )
 
 const Doc = `Checks key value pairs for common logger libraries (kitlog,klog,logr,zap).`

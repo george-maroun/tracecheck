@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/tools/go/analysis/analysistest"
 
-	"github.com/jlewi/roboweb/tracecheck"
+	"github.com/george-maroun/tracecheck"
 )
 
 // N.B. Before running the tests you need to

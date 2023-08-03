@@ -1,7 +1,7 @@
 package loggercheck
 
 import (
-	"github.com/jlewi/roboweb/tracecheck/internal/sets"
+	"github.com/george-maroun/tracecheck/internal/sets"
 )
 
 type Option func(*loggercheck)
