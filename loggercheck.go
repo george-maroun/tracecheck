@@ -6,6 +6,7 @@ import (
 	"go/ast"
 	"go/types"
 	"os"
+	"sync"
 	"strings"
 
 	"golang.org/x/tools/go/analysis"
@@ -43,6 +44,7 @@ type loggercheck struct {
 	rules                  []string         // used for external integration, for example golangci-lint
 	rulesetList            []rules.Ruleset  // populate at runtime
 	rulesetIndicesByImport map[string][]int // ruleset index, populate at runtime
+	mu sync.Mutex
 	CallToFile map[*ast.CallExpr]*ast.File
 }
 
@@ -153,6 +155,8 @@ func (l *loggercheck) checkLoggerArguments(pass *analysis.Pass, call *ast.CallEx
 }
 
 func (l *loggercheck) processConfig() error {
+	l.mu.Lock() // lock
+	defer l.mu.Unlock()
 	if l.ruleFile != "" { // flags takes precedence over configs
 		f, err := os.Open(l.ruleFile)
 		if err != nil {
@@ -204,7 +208,11 @@ func (l *loggercheck) run(pass *analysis.Pass) (interface{}, error) {
 
 		// Save the current file to the map
 		// N.B.: Not sure if correct way to get current file
-    l.CallToFile[call] = pass.Files[0] 
+    // Lock the mutex before accessing the shared resource
+		l.mu.Lock()
+		l.CallToFile[call] = pass.Files[0]
+		// Unlock it afterwards
+		l.mu.Unlock()
 
 		typ := pass.TypesInfo.Types[call.Fun].Type
 		if typ == nil {

@@ -202,11 +202,16 @@ func enclosingFunc(file *ast.File, pos token.Pos) (fun *ast.FuncDecl, funLit *as
 func findPosOfFuncBody(file *ast.File, call *ast.CallExpr) token.Pos {
 	fun, _ := enclosingFunc(file, call.Pos())
 
-	insertPos := fun.Body.Rbrace
-	if len(fun.Body.List) > 0 {
-		insertPos = fun.Body.List[0].Pos()
+	if fun != nil && fun.Body != nil {
+		insertPos := fun.Body.Rbrace
+		if len(fun.Body.List) > 0 {
+			insertPos = fun.Body.List[0].Pos()
+		}
+		return insertPos
 	}
-	return insertPos
+	// If fun or fun.Body is nil, return a valid position or handle the error appropriately
+	// For now, we just return token.NoPos
+	return token.NoPos
 }
 
 
