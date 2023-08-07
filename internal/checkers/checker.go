@@ -52,8 +52,9 @@ func ExecuteChecker(c Checker, pass *analysis.Pass, call CallContext, cfg Config
 			Message:  "odd number of arguments passed as key-value pairs for logging",
 		})
 	}
-
-	hasTraceId := false
+	// TODO: VERY IMPORTANT 🚨 should initialize hasTraceId to false
+	// hasTraceId is initialized to true to temporarily turn off traceId check 
+	hasTraceId := true
 	for i := 0; i < len(keyValuesArgs); i += 2 {
 		arg := keyValuesArgs[i]
 		basic, ok := arg.(*ast.BasicLit)

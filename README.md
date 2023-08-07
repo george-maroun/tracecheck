@@ -2,6 +2,8 @@
 
 ## Description
 
+Still under development 🚧
+
 A linter checks the odd number of key and value pairs for common logger libraries:
 - [kitlog](https://github.com/go-kit/log)
 - [klog](https://github.com/kubernetes/klog)
