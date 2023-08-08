@@ -54,8 +54,13 @@ func ExecuteChecker(c Checker, pass *analysis.Pass, call CallContext, cfg Config
 	}
 
 	// Return if WithValues is not invoked on NewLogger
-	result := isWithValuesCallOnNewLogger(call.File, call.Expr.Pos())
-	if result == false {
+	onNewLogger := isWithValuesCallOnNewLogger(call.File, call.Expr.Pos())
+	if onNewLogger == false {
+		return
+	}
+
+	funcTakesContext := hasContextParameter(call.File, call.Expr.Pos())
+	if funcTakesContext == false {
 		return
 	}
 
@@ -186,16 +191,12 @@ func ExecuteChecker(c Checker, pass *analysis.Pass, call CallContext, cfg Config
 
 // EnclosingFunc finds the function that encloses the given position.
 // TODO: Refactor the code to avoid revisiting files 
-func enclosingFunc(file *ast.File, pos token.Pos) (fun *ast.FuncDecl, funLit *ast.FuncLit) {
+func enclosingFunc(file *ast.File, pos token.Pos) (fun *ast.FuncDecl) {
 	ast.Inspect(file, func(n ast.Node) bool {
 		switch v := n.(type) {
 		case *ast.FuncDecl:
 			if v.Body != nil && pos >= v.Body.Pos() && pos <= v.Body.End() {
 				fun = v
-			}
-		case *ast.FuncLit:
-			if pos >= v.Body.Pos() && pos <= v.Body.End() {
-				funLit = v
 			}
 		}
 		return true
@@ -206,7 +207,7 @@ func enclosingFunc(file *ast.File, pos token.Pos) (fun *ast.FuncDecl, funLit *as
 // FindPosOfFuncBody returns the position of the beginning of the function's body
 // that contains the given call expression.
 func findPosOfFuncBody(file *ast.File, call *ast.CallExpr) token.Pos {
-	fun, _ := enclosingFunc(file, call.Pos())
+	fun := enclosingFunc(file, call.Pos())
 
 	if fun != nil && fun.Body != nil {
 		insertPos := fun.Body.Rbrace
@@ -219,6 +220,25 @@ func findPosOfFuncBody(file *ast.File, call *ast.CallExpr) token.Pos {
 	// For now, we just return token.NoPos
 	return token.NoPos
 }
+
+func hasContextParameter(file *ast.File, pos token.Pos) bool {
+	fun := enclosingFunc(file, pos)
+
+	// Check if the enclosing function declaration has a parameter of type context.Context
+	if fun != nil {
+		for _, param := range fun.Type.Params.List {
+			if selExpr, ok := param.Type.(*ast.SelectorExpr); ok {
+				if xIdent, ok := selExpr.X.(*ast.Ident); ok && xIdent.Name == "context" {
+					if selExpr.Sel.Name == "Context" {
+						return true
+					}
+				}
+			}
+		}
+	}
+	return false
+}
+
 
 
 func getArgs(call *ast.CallExpr) ([]string, error) {
@@ -332,8 +352,3 @@ func isWithValuesCallOnNewLogger(file *ast.File, pos token.Pos) bool {
 	})
 	return result
 }
-
-
-
-
-
