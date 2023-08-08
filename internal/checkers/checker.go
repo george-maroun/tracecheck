@@ -321,9 +321,7 @@ func isWithValuesCallOnNewLogger(file *ast.File, pos token.Pos) bool {
 					if call, ok := sel.X.(*ast.CallExpr); ok {
 						if sel, ok := call.Fun.(*ast.SelectorExpr); ok {
 							if sel.Sel.Name == "NewLogger" {
-								fmt.Println("WORKS")
 								result = true
-								return true
 							}
 						}
 					}
