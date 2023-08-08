@@ -200,19 +200,30 @@ func (l *loggercheck) run(pass *analysis.Pass) (interface{}, error) {
 	insp.Preorder(nodeFilter, func(node ast.Node) {
 		call := node.(*ast.CallExpr)
 
-		// Get the current file from the node's position
-		file := pass.Fset.File(call.Pos())
+		tokFile := pass.Fset.File(call.Pos())
+		if tokFile == nil {
+			return
+		}
+
+		// Find the corresponding ast.File
+		var file *ast.File
+		for _, f := range pass.Files {
+			if pass.Fset.File(f.Pos()) == tokFile {
+				file = f
+				break
+			}
+		}
+
 		if file == nil {
 			return
 		}
 
 		// Save the current file to the map
-		// N.B.: Not sure if correct way to get current file
     // Lock the mutex before accessing the shared resource
 		l.mu.Lock()
-		l.CallToFile[call] = pass.Files[0]
+		l.CallToFile[call] = file
 		// Unlock it afterwards
-		l.mu.Unlock()
+		defer l.mu.Unlock()
 
 		typ := pass.TypesInfo.Types[call.Fun].Type
 		if typ == nil {

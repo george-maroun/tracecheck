@@ -6,11 +6,6 @@ import (
 	"github.com/go-logr/logr"
 )
 
-func ExampleLogRTraceID() {
-	log := logr.Discard()
-	log = log.WithValues("key", "value")   // want `missing traceId in logging keys`
-}
-
 func ExampleInvalid() {
 	// function pointer is not supported
 	log := logr.Discard()

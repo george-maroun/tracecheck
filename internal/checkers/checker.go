@@ -52,9 +52,14 @@ func ExecuteChecker(c Checker, pass *analysis.Pass, call CallContext, cfg Config
 			Message:  "odd number of arguments passed as key-value pairs for logging",
 		})
 	}
-	// TODO: VERY IMPORTANT 🚨 should initialize hasTraceId to false
-	// hasTraceId is initialized to true to temporarily turn off traceId check 
-	hasTraceId := true
+
+	// Return if WithValues is not invoked on NewLogger
+	result := isWithValuesCallOnNewLogger(call.File, call.Expr.Pos())
+	if result == false {
+		return
+	}
+
+	hasTraceId := false
 	for i := 0; i < len(keyValuesArgs); i += 2 {
 		arg := keyValuesArgs[i]
 		basic, ok := arg.(*ast.BasicLit)
@@ -297,3 +302,38 @@ func getImportPos(file *ast.File, lib string) (token.Pos, error) {
 
 	return token.NoPos, nil
 }
+
+// TODO: Refactor this function
+func isWithValuesCallOnNewLogger(file *ast.File, pos token.Pos) bool {
+	// Function to find the node at the given position
+	var result bool
+	ast.Inspect(file, func(n ast.Node) bool {
+		if n == nil {
+			return false
+		}
+		// Check if the node corresponds to the given position
+		if n.Pos() <= pos && pos <= n.End() {
+			// Check if the node is a call expression
+			if call, ok := n.(*ast.CallExpr); ok {
+				// Check if the function being called is a selector expression (e.g., obj.Method())
+				if sel, ok := call.Fun.(*ast.SelectorExpr); ok {
+						// Check if the receiver is a call to zapr.NewLogger
+					if call, ok := sel.X.(*ast.CallExpr); ok {
+						if sel, ok := call.Fun.(*ast.SelectorExpr); ok {
+							if sel.Sel.Name == "NewLogger" {
+								result = true
+							}
+						}
+					}
+				}
+			}
+		}
+		return true
+	})
+	return result
+}
+
+
+
+
+
