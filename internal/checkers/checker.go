@@ -52,9 +52,44 @@ func ExecuteChecker(c Checker, pass *analysis.Pass, call CallContext, cfg Config
 			Message:  "odd number of arguments passed as key-value pairs for logging",
 		})
 	}
-	// TODO: VERY IMPORTANT 🚨 should initialize hasTraceId to false
-	// hasTraceId is initialized to true to temporarily turn off traceId check 
-	hasTraceId := true
+
+	// // Find the enclosing statement that contains the call
+	// enclosingStmt := findEnclosingStmt(call.File, call.Expr)
+	// if enclosingStmt == nil {
+	// 	fmt.Println("enclosingStmt == nil")
+	// 	return // Exit if no enclosing statement is found
+	// }
+
+	// // Convert the enclosing statement to string
+	// var buf bytes.Buffer
+	// fset := token.NewFileSet()
+	// if err := printer.Fprint(&buf, fset, enclosingStmt); err != nil {
+	// 	fmt.Println("printer.Fprint(&buf, fset, enclosingStmt) == err")
+	// 	return // Handle error, if needed
+	// }
+	// fmt.Printf("HELLLOOOOOOOOOO: %v", enclosingStmt)
+
+	// // Check if the line contains "NewLogger"
+	// if !strings.Contains(buf.String(), "NewLogger") {
+	// 	return // Exit if "NewLogger" is not found
+	// }
+
+	// // Find the line of code containing the call
+	// lineNumber := pass.Fset.Position(call.Expr.Pos()).Line
+
+	// // Retrieve the line content using the provided file set and position
+	// lineContent := getLineContent(pass.Fset.File(call.Expr.Pos()), lineNumber)
+	// if lineContent == "" || !strings.Contains(lineContent, "NewLogger") {
+	// 	return // Exit if "NewLogger" is not found
+	// }
+
+	result := isWithValuesCallOnNewLogger(call.File, call.Expr.Pos())
+	if result == false {
+		return
+	}
+
+
+	hasTraceId := false
 	for i := 0; i < len(keyValuesArgs); i += 2 {
 		arg := keyValuesArgs[i]
 		basic, ok := arg.(*ast.BasicLit)
@@ -297,3 +332,39 @@ func getImportPos(file *ast.File, lib string) (token.Pos, error) {
 
 	return token.NoPos, nil
 }
+
+func isWithValuesCallOnNewLogger(file *ast.File, pos token.Pos) bool {
+	// Function to find the node at the given position
+	var result bool
+	ast.Inspect(file, func(n ast.Node) bool {
+		if n == nil {
+			return false
+		}
+		// Check if the node corresponds to the given position
+		if n.Pos() <= pos && pos <= n.End() {
+			// Check if the node is a call expression
+			if call, ok := n.(*ast.CallExpr); ok {
+				// Check if the function being called is a selector expression (e.g., obj.Method())
+				if sel, ok := call.Fun.(*ast.SelectorExpr); ok {
+						// Check if the receiver is a call to zapr.NewLogger
+					if call, ok := sel.X.(*ast.CallExpr); ok {
+						if sel, ok := call.Fun.(*ast.SelectorExpr); ok {
+							if sel.Sel.Name == "NewLogger" {
+								fmt.Println("WORKS")
+								result = true
+								return true
+							}
+						}
+					}
+				}
+			}
+		}
+		return true
+	})
+	return result
+}
+
+
+
+
+

@@ -8,7 +8,7 @@ import (
 
 func ExampleLogRTraceID() {
 	log := logr.Discard()
-	log = log.WithValues("key", "value")   // want `missing traceId in logging keys`
+	log = log.WithValues("key", "value")
 }
 
 func ExampleInvalid() {

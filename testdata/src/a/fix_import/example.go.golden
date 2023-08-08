@@ -10,6 +10,7 @@ import (
 func SomeFunc(ctx context.Context, eventType, deliveryID string, payload []byte) error {
 	span := trace.SpanFromContext(ctx)
 	log := zapr.NewLogger(zap.L()).WithValues("traceId", span.SpanContext().TraceID().String(), "spanId", span.SpanContext().SpanID().String(), "eventType", eventType, "deliverID", deliveryID) // want `missing traceId in logging keys`
+	log = log.WithValues("eventType", "hello")
 	log.Info("Tracing")
 	return nil
 }
