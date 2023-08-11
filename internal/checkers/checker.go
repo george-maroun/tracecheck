@@ -66,13 +66,6 @@ func ExecuteChecker(c Checker, pass *analysis.Pass, call CallContext, cfg Config
 
 	hasTraceId := false
 	for i := 0; i < len(keyValuesArgs); i += 2 {
-		arg := keyValuesArgs[i]
-		basic, ok := arg.(*ast.BasicLit)
-		if !ok {
-			// Just ignore it if its not of type BasicLiteral
-			continue
-		}
-
 		// We use traceId not traceID based on spanId in Google stackdriver stuctured logging
 		// https://cloud.google.com/logging/docs/structured-logging
 		// In the opentelemetry docs it is "TraceId"
@@ -82,8 +75,25 @@ func ExecuteChecker(c Checker, pass *analysis.Pass, call CallContext, cfg Config
 		// This is also how its defined in the OpenTelemetry spec for jsonLogs
 		// https://opentelemetry.io/docs/specs/otel/protocol/file-exporter/#examples
 		// https://opentelemetry.io/docs/specs/otel/logs/
-		if basic.Value == "\"traceId\"" {
-			hasTraceId = true
+		arg := keyValuesArgs[i]
+
+		switch v := arg.(type) {
+		case *ast.BasicLit:
+			if strings.Contains(strings.ToLower(v.Value), "trace") {
+				hasTraceId = true
+			}
+		case *ast.Ident:
+			// v.Name contains the name (label) of the variable
+			if strings.Contains(strings.ToLower(v.Name), "trace") {
+				hasTraceId = true
+			}
+		case *ast.SelectorExpr:
+			// Check if the selector (right part) of the qualified identifier contains "trace"
+			if strings.Contains(strings.ToLower(v.Sel.Name), "trace") {
+				hasTraceId = true
+			}
+		}
+		if hasTraceId == true {
 			break
 		}
 	}
