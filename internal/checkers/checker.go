@@ -66,26 +66,15 @@ func ExecuteChecker(c Checker, pass *analysis.Pass, call CallContext, cfg Config
 
 	hasTraceId := false
 	for i := 0; i < len(keyValuesArgs); i += 2 {
-		// arg := keyValuesArgs[i]
-		// basic, ok := arg.(*ast.BasicLit)
-		// if !ok {
-		// 	// Just ignore it if its not of type BasicLiteral
-		// 	continue
-		// }
-
-		// // We use traceId not traceID based on spanId in Google stackdriver stuctured logging
-		// // https://cloud.google.com/logging/docs/structured-logging
-		// // In the opentelemetry docs it is "TraceId"
-		// // https://opentelemetry.io/docs/specs/otel/trace/api/#retrieving-the-traceid-and-spanid
-		// // It looks like in the wire format of the w3c spec it might be trace-id
-		// // https://www.w3.org/TR/trace-context/#trace-id
-		// // This is also how its defined in the OpenTelemetry spec for jsonLogs
-		// // https://opentelemetry.io/docs/specs/otel/protocol/file-exporter/#examples
-		// // https://opentelemetry.io/docs/specs/otel/logs/
-		// if basic.Value == "\"traceId\"" {
-		// 	hasTraceId = true
-		// 	break
-		// }
+		// We use traceId not traceID based on spanId in Google stackdriver stuctured logging
+		// https://cloud.google.com/logging/docs/structured-logging
+		// In the opentelemetry docs it is "TraceId"
+		// https://opentelemetry.io/docs/specs/otel/trace/api/#retrieving-the-traceid-and-spanid
+		// It looks like in the wire format of the w3c spec it might be trace-id
+		// https://www.w3.org/TR/trace-context/#trace-id
+		// This is also how its defined in the OpenTelemetry spec for jsonLogs
+		// https://opentelemetry.io/docs/specs/otel/protocol/file-exporter/#examples
+		// https://opentelemetry.io/docs/specs/otel/logs/
 		arg := keyValuesArgs[i]
 
 		switch v := arg.(type) {
