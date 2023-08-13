@@ -2,14 +2,10 @@
 
 ## Description
 
-Tracecheck is a Go linter that ensures proper use and formatting for common logger libraries:
-- [kitlog](https://github.com/go-kit/log)
-- [klog](https://github.com/kubernetes/klog)
-- [logr](https://github.com/go-logr/logr)
-- [zap](https://github.com/uber-go/zap)
+Tracecheck is a Go linter that checks for a traceId in a logger definition and adds it if missing.
 
 Here's a summary of functionalities of Tracecheck:
-- Check the odd number of key and value pairs for common logger libraries
+- Check for odd number of key and value pairs for common logger libraries
 - Check for the use of a traceId with the logger in functions that take a context as argument
 - Add a traceId and spanId when absent using the -fix flag
 
@@ -31,8 +27,6 @@ go install github.com/george-maroun/tracecheck/cmd/tracecheck
 ## Usage
 
 ```
-Tracecheck: Checks key value pairs for common logger libraries (kitlog,logr,klog,zap).
-
 Usage: tracecheck [-flag] [package]
 
 
@@ -77,8 +71,8 @@ Flags:
 
 Run: tracecheck -fix ./...
 
-If a traceId is missing from the logger in a function that takes a context as arguments:
--> Tracecheck adds an import to go.opentelemetry.io/otel/trace, a span declaration, and traceId and spanId key-value arguments to the logger.
+If the logger does not specify a traceId:
+-> Tracecheck adds a span declaration, and traceId and spanId key-value arguments to the logger.
 
 ```go
 package fix_import
