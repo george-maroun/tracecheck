@@ -1,16 +1,17 @@
-# loggercheck
+# Tracecheck
 
 ## Description
 
-Still under development 🚧
+Tracecheck is a Go linter that checks for a traceId in a logger definition and adds it if missing.
 
-A linter checks the odd number of key and value pairs for common logger libraries:
-- [kitlog](https://github.com/go-kit/log)
-- [klog](https://github.com/kubernetes/klog)
-- [logr](https://github.com/go-logr/logr)
-- [zap](https://github.com/uber-go/zap)
+Here's a summary of functionalities of Tracecheck:
+- Check for odd number of key and value pairs for common logger libraries
+- Check for the use of a traceId with the logger in functions that take a context as argument
+- Add a traceId and spanId when absent using the -fix flag
 
-It's recommended to use loggercheck with [golangci-lint](https://golangci-lint.run/usage/linters/#loggercheck).
+It's recommended to use Tracecheck with [golangci-lint](https://golangci-lint.run/usage/linters/#loggercheck).
+
+Based on [Loggercheck](https://github.com/timonwong/loggercheck#readme)
 
 ## Badges
 
@@ -19,16 +20,14 @@ It's recommended to use loggercheck with [golangci-lint](https://golangci-lint.r
 
 ## Install
 
-```shel
+```shell
 go install github.com/george-maroun/tracecheck/cmd/tracecheck
 ```
 
 ## Usage
 
 ```
-loggercheck: Checks key value pairs for common logger libraries (kitlog,logr,klog,zap).
-
-Usage: loggercheck [-flag] [package]
+Usage: tracecheck [-flag] [package]
 
 
 Flags:
@@ -70,36 +69,44 @@ Flags:
 
 ## Example
 
+Run: tracecheck -fix ./...
+
+If the logger does not specify a traceId:
+-> Tracecheck adds a span declaration, and traceId and spanId key-value arguments to the logger.
+
 ```go
-package a
+package fix_import
 
 import (
+	"github.com/go-logr/zapr"
+	"go.uber.org/zap"
 	"context"
-	"fmt"
-
-	"github.com/go-logr/logr"
 )
 
-func Example() {
-	log := logr.Discard()
-	log = log.WithValues("key")
-	log.Info("message", "key1", "value1", "key2", "value2", "key3")
-	log.Error(fmt.Errorf("error"), "message", "key1", "value1", "key2")
-	log.Error(fmt.Errorf("error"), "message", "key1", "value1", "key2", "value2")
-
-	var log2 logr.Logger
-	log2 = log
-	log2.Info("message", "key1")
-
-	log3 := logr.FromContextOrDiscard(context.TODO())
-	log3.Error(fmt.Errorf("error"), "message", "key1")
+func SomeFunc(ctx context.Context, eventType, deliveryID string, payload []byte) error {
+	log := zapr.NewLogger(zap.L()).WithValues("eventType", eventType, "deliverID", deliveryID)
+	return nil
 }
 ```
 
+```go
+package fix_import
+
+import (
+	"context"
+	"github.com/go-logr/zapr"
+	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/zap"
+)
+
+func SomeFunc(ctx context.Context, eventType, deliveryID string, payload []byte) error {
+	span := trace.SpanFromContext(ctx)
+	log := zapr.NewLogger(zap.L()).WithValues("traceId", span.SpanContext().TraceID().String(), "spanId", span.SpanContext().SpanID().String(), "eventType", eventType, "deliverID", deliveryID)
+	return nil
+}
+
 ```
-a.go:12:23: odd number of arguments passed as key-value pairs for logging
-a.go:13:22: odd number of arguments passed as key-value pairs for logging
-a.go:14:44: odd number of arguments passed as key-value pairs for logging
-a.go:19:23: odd number of arguments passed as key-value pairs for logging
-a.go:22:45: odd number of arguments passed as key-value pairs for logging
+
+```
+a.go:10:23: missing traceId in logging keys
 ```
